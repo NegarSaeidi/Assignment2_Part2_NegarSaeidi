@@ -6,6 +6,7 @@ TagManager:
   tags:
   - platform
   - potion
+  - hazard
   layers:
   - Default
   - TransparentFX
@@ -16,7 +17,7 @@ TagManager:
   - ground
   - block
   - platform
-  - 
+  - Player
   - 
   - 
   - 

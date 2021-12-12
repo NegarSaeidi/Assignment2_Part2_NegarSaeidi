@@ -12,12 +12,16 @@ public class EnemyController : MonoBehaviour
     public LayerMask wallLayerMask;
     public bool isGroundAhead;
 
+    [Header("PlayerDetection")]
+    public LOS enemyLOS;
     private Rigidbody2D rigidbody;
-
+    private Animator anim;
     // Start is called before the first frame update
     void Start()
     {
+        enemyLOS = GetComponent<LOS>();
         rigidbody = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -25,7 +29,14 @@ public class EnemyController : MonoBehaviour
     {
         LookAhead();
         LookInFront();
-        MoveEnemy();
+        if (!HasLOS())
+        {
+            MoveEnemy();
+            anim.SetBool("Attack", false);
+        }
+        else
+            anim.SetBool("Attack", true);
+
     }
 
     private void LookAhead()
@@ -78,7 +89,17 @@ public class EnemyController : MonoBehaviour
             transform.SetParent(null);
         }
     }
+    private bool HasLOS()
+    {
+        if (enemyLOS.colliderList.Count > 0)
+        {
+            if ((enemyLOS.collidesWith.gameObject.name == "Player") && (enemyLOS.colliderList[0].gameObject.name == "Player"))
 
+                return true;
+        }
+
+        return false;
+    }
 
     // UTILITIES
 

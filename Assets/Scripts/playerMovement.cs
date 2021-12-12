@@ -16,12 +16,16 @@ public class playerMovement : MonoBehaviour
     private Animator animController;
     private Rigidbody2D rigidbody;
     private int Jars;
+    public GameObject[] hearts;
     private int min, sec, hour;
     private float timer;
     private float startTime;
+    private int index = 0;
+    public Transform playerSpawnPoint;
     // Start is called before the first frame update
     void Start()
     {
+      
         Jars = 0;
         min = sec = hour = 0;
         timer = 0;
@@ -36,11 +40,25 @@ public class playerMovement : MonoBehaviour
         Move();
         CheckIfGrounded();
         setTimer();
+        loseHeart();
+
         
+    }
+    private void loseHeart()
+    {
+        if(transform.position.y<-5.62f)
+        {
+            if (index <= 2)
+            {
+                Destroy(hearts[index].gameObject);
+                index++;
+            }
+        }
     }
     private void Move()
     {
         float x, y, jump;
+        bool attack;
         x = Input.GetAxisRaw("Horizontal");
         if (isGrounded)
         {
@@ -51,7 +69,8 @@ public class playerMovement : MonoBehaviour
 
             y = Input.GetAxisRaw("Vertical");
             jump = Input.GetAxisRaw("Jump");
-
+            attack = Input.GetKeyDown(KeyCode.X);
+        
             // Check for Flip
             if (x != 0)
             {
@@ -62,8 +81,12 @@ public class playerMovement : MonoBehaviour
             {
                 animController.SetInteger("AnimState", 0);
             }
-      
-
+            if(attack)
+            {
+                
+                animController.SetTrigger("Attack");
+            }
+          
             // Touch Input
             Vector2 worldTouch = new Vector2();
             foreach (var touch in Input.touches)
@@ -137,6 +160,11 @@ public class playerMovement : MonoBehaviour
             Jars += 10;
             jarCount.text = Jars.ToString();
             Destroy(other.gameObject);
+        }
+        else if (other.gameObject.CompareTag("hazard"))
+        {
+            loseHeart();
+            transform.position = playerSpawnPoint.position;
         }
     }
     private void OnCollisionExit2D(Collision2D other)
