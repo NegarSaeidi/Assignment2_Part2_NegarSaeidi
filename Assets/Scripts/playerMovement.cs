@@ -16,21 +16,31 @@ public class playerMovement : MonoBehaviour
     public Text jarCount,timeLabel;
     private Animator animController;
     private Rigidbody2D rigidbody;
-    private int Jars;
+    public int Jars;
     public GameObject[] hearts;
-    private int min, sec, hour;
+    public int min, sec, hour;
     private float timer;
     private float startTime;
     private int index = 0;
     public Transform playerSpawnPoint;
+    public Transform checkForHitEnemy;
+    public LayerMask EnemyMask;
+    private int DamageToEnemy;
+    private bool kill,attacking;
+    private AudioSource sword;
+    private int enemyCount;
     // Start is called before the first frame update
     void Start()
     {
-      
+        DamageToEnemy = 0;
         Jars = 0;
         min = sec = hour = 0;
         timer = 0;
+        kill = false;
+        enemyCount = 0;
+        attacking = false;
         startTime = Time.time;
+        sword = GetComponent<AudioSource>();
         animController = GetComponent<Animator>();
         rigidbody = GetComponent<Rigidbody2D>();
     }
@@ -41,6 +51,7 @@ public class playerMovement : MonoBehaviour
         Move();
         CheckIfGrounded();
         setTimer();
+       
         if (transform.position.y < -5.62f)
             loseHeart();
 
@@ -56,7 +67,9 @@ public class playerMovement : MonoBehaviour
           }
          else
         {
-          
+            PlayerPrefs.SetInt("jars", Jars);
+            PlayerPrefs.SetString("time", timeLabel.text);
+            PlayerPrefs.SetInt("enemy", enemyCount);
            animController.SetTrigger("dead");
             StartCoroutine(delayBeforLoading(1.5f));
            
@@ -68,6 +81,28 @@ public class playerMovement : MonoBehaviour
         yield return new WaitForSeconds(sec);
     
         SceneManager.LoadScene("Result");
+
+    }
+    private void checkForHit()
+    {
+      
+        Vector3 playerTransform = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
+        var hit = Physics2D.Linecast(playerTransform, checkForHitEnemy.position, EnemyMask);
+        if (hit)
+        {
+         
+                if (DamageToEnemy < 2)
+                {
+                    DamageToEnemy++;
+                }
+                else
+                {
+
+                    kill = true;
+
+                }
+            
+        }
 
     }
     private void Move()
@@ -98,10 +133,15 @@ public class playerMovement : MonoBehaviour
             }
             if(attack)
             {
-                
+                sword.Play();
                 animController.SetTrigger("Attack");
+                checkForHit();
             }
-          
+      
+            //else
+            //{
+            //    attacking = false;
+            //}
             // Touch Input
             Vector2 worldTouch = new Vector2();
             foreach (var touch in Input.touches)
@@ -161,19 +201,22 @@ public class playerMovement : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Vector3 playerTransform = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z);
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(groundOrigin.position, groundRadius);
+        Gizmos.DrawLine(playerTransform, checkForHitEnemy.position);
     }
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("platform"))
         {
-            transform.SetParent(other.transform);
+            transform.SetParent(other.gameObject.transform.parent);
         }
         else if(other.gameObject.CompareTag("potion"))
         {
             Jars += 10;
             jarCount.text = Jars.ToString();
+            other.gameObject.GetComponent<AudioSource>().Play();
             Destroy(other.gameObject);
         }
         else if (other.gameObject.CompareTag("hazard"))
@@ -181,6 +224,23 @@ public class playerMovement : MonoBehaviour
             loseHeart();
            
         }
+        else if (other.gameObject.CompareTag("Enemy"))
+        {
+            if (kill)
+            {
+                enemyCount++;
+                other.gameObject.GetComponent<Animator>().SetBool("Dead", true);
+                StartCoroutine(causeDelay(other.gameObject));
+            }
+        }
+    }
+
+    private IEnumerator causeDelay(GameObject other)
+    {
+        yield return new WaitForSeconds(2.0f);
+        Destroy(other.gameObject);
+        kill = false;
+
     }
     private void OnCollisionExit2D(Collision2D other)
     {

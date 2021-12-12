@@ -44,12 +44,12 @@ public class EnemyController : MonoBehaviour
     }
     private void checkForHit()
     {
-        Vector3 playerTransform = new Vector3(transform.position.x, transform.position.y -0.5f, transform.position.z);
-        var hit = Physics2D.Linecast(playerTransform, checkForHitPlayer.position, playerMask);
+        Vector3 enemyTransform = new Vector3(transform.position.x, transform.position.y -0.5f, transform.position.z);
+        var hit = Physics2D.Linecast(enemyTransform, checkForHitPlayer.position, playerMask);
         if(hit)
         {
            
-            if(damageToPlayer<80)
+            if(damageToPlayer<160)
             {
                 damageToPlayer++;
             }
@@ -129,10 +129,10 @@ public class EnemyController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Vector3 playerTransform = new Vector3(transform.position.x, transform.position.y -0.5f, transform.position.z);
+        Vector3 enemyTransform = new Vector3(transform.position.x, transform.position.y -0.5f, transform.position.z);
         Gizmos.color = Color.green;
         Gizmos.DrawLine(transform.position, lookAheadPoint.position);
         Gizmos.DrawLine(transform.position, lookInFrontPoint.position);
-        Gizmos.DrawLine(playerTransform, checkForHitPlayer.position);
+        Gizmos.DrawLine(enemyTransform, checkForHitPlayer.position);
     }
 }
