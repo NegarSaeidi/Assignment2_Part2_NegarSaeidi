@@ -107,9 +107,19 @@ public class playerMovement : MonoBehaviour
     }
     private void Move()
     {
-        float x, y, jump;
+        float x, y, jump, attackByTouch;
         bool attack;
-        x = Input.GetAxisRaw("Horizontal");
+        Vector2 worldTouch = new Vector2();
+        foreach (var touch in Input.touches)
+        {
+            worldTouch = Camera.main.ScreenToWorldPoint(touch.position);
+            if (worldTouch.x < 0)
+                worldTouch.x = -1;
+            else
+                worldTouch.x = +1;
+        }
+       
+        x = Input.GetAxisRaw("Horizontal")+worldTouch.x;
         if (isGrounded)
         {
             //float deltaTime = Time.deltaTime;
@@ -118,10 +128,10 @@ public class playerMovement : MonoBehaviour
             // Keyboard Input
 
             y = Input.GetAxisRaw("Vertical");
-            jump = Input.GetAxisRaw("Jump");
+            jump = Input.GetAxisRaw("Jump") + (UIController.jumpButton ? 1.0f : 0.0f);
             attack = Input.GetKeyDown(KeyCode.X);
-        
-            // Check for Flip
+            attackByTouch = (UIController.attackButton ? 1.0f : 0.0f);
+            // Chck for Flip
             if (x != 0)
             {
                 x = FlipAnimation(x);
@@ -131,7 +141,7 @@ public class playerMovement : MonoBehaviour
             {
                 animController.SetInteger("AnimState", 0);
             }
-            if(attack)
+            if(attack || attackByTouch>0)
             {
                 sword.Play();
                 animController.SetTrigger("Attack");
@@ -143,12 +153,7 @@ public class playerMovement : MonoBehaviour
             //    attacking = false;
             //}
             // Touch Input
-            Vector2 worldTouch = new Vector2();
-            foreach (var touch in Input.touches)
-            {
-                worldTouch = Camera.main.ScreenToWorldPoint(touch.position);
-            }
-
+          
             float horizontalMoveForce = x * horizontalForce;// * deltaTime;
             float jumpMoveForce = jump * verticalForce; // * deltaTime;
 
