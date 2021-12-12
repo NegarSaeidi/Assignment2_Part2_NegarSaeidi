@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class playerMovement : MonoBehaviour
 {
@@ -40,20 +41,34 @@ public class playerMovement : MonoBehaviour
         Move();
         CheckIfGrounded();
         setTimer();
-        loseHeart();
+        if (transform.position.y < -5.62f)
+            loseHeart();
 
         
     }
-    private void loseHeart()
+    public void loseHeart()
     {
-        if(transform.position.y<-5.62f)
-        {
-            if (index <= 2)
-            {
+         if (index < 2)
+          {
+                transform.position = playerSpawnPoint.position;
                 Destroy(hearts[index].gameObject);
-                index++;
-            }
+               index++;
+          }
+         else
+        {
+          
+           animController.SetTrigger("dead");
+            StartCoroutine(delayBeforLoading(1.5f));
+           
         }
+        }
+    private IEnumerator delayBeforLoading(float sec)
+    {
+       
+        yield return new WaitForSeconds(sec);
+    
+        SceneManager.LoadScene("Result");
+
     }
     private void Move()
     {
@@ -164,7 +179,7 @@ public class playerMovement : MonoBehaviour
         else if (other.gameObject.CompareTag("hazard"))
         {
             loseHeart();
-            transform.position = playerSpawnPoint.position;
+           
         }
     }
     private void OnCollisionExit2D(Collision2D other)

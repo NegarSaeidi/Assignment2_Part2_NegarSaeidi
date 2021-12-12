@@ -9,16 +9,19 @@ public class EnemyController : MonoBehaviour
     public Transform lookAheadPoint;
     public Transform lookInFrontPoint;
     public LayerMask groundLayerMask;
-    public LayerMask wallLayerMask;
+    public LayerMask wallLayerMask,playerMask;
     public bool isGroundAhead;
-
+    public Transform checkForHitPlayer;
     [Header("PlayerDetection")]
     public LOS enemyLOS;
     private Rigidbody2D rigidbody;
     private Animator anim;
+    public playerMovement player;
+    private int damageToPlayer;
     // Start is called before the first frame update
     void Start()
     {
+        damageToPlayer = 0;
         enemyLOS = GetComponent<LOS>();
         rigidbody = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -29,6 +32,7 @@ public class EnemyController : MonoBehaviour
     {
         LookAhead();
         LookInFront();
+        checkForHit();
         if (!HasLOS())
         {
             MoveEnemy();
@@ -38,7 +42,27 @@ public class EnemyController : MonoBehaviour
             anim.SetBool("Attack", true);
 
     }
+    private void checkForHit()
+    {
+        Vector3 playerTransform = new Vector3(transform.position.x, transform.position.y -0.5f, transform.position.z);
+        var hit = Physics2D.Linecast(playerTransform, checkForHitPlayer.position, playerMask);
+        if(hit)
+        {
+           
+            if(damageToPlayer<80)
+            {
+                damageToPlayer++;
+            }
+            else
+            {
+               
+                player.loseHeart();
+                damageToPlayer = 0;
+                
+            }
+        }
 
+    }
     private void LookAhead()
     {
         var hit = Physics2D.Linecast(transform.position, lookAheadPoint.position, groundLayerMask);
@@ -105,8 +129,10 @@ public class EnemyController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Vector3 playerTransform = new Vector3(transform.position.x, transform.position.y -0.5f, transform.position.z);
         Gizmos.color = Color.green;
         Gizmos.DrawLine(transform.position, lookAheadPoint.position);
         Gizmos.DrawLine(transform.position, lookInFrontPoint.position);
+        Gizmos.DrawLine(playerTransform, checkForHitPlayer.position);
     }
 }
