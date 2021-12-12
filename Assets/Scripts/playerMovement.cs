@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class playerMovement : MonoBehaviour
 {
@@ -11,12 +12,20 @@ public class playerMovement : MonoBehaviour
     public Transform groundOrigin;
     public float groundRadius;
     public LayerMask groundLayerMask;
-
+    public Text jarCount,timeLabel;
     private Animator animController;
     private Rigidbody2D rigidbody;
+    private int Jars;
+    private int min, sec, hour;
+    private float timer;
+    private float startTime;
     // Start is called before the first frame update
     void Start()
     {
+        Jars = 0;
+        min = sec = hour = 0;
+        timer = 0;
+        startTime = Time.time;
         animController = GetComponent<Animator>();
         rigidbody = GetComponent<Rigidbody2D>();
     }
@@ -26,6 +35,8 @@ public class playerMovement : MonoBehaviour
     {
         Move();
         CheckIfGrounded();
+        setTimer();
+        
     }
     private void Move()
     {
@@ -121,6 +132,12 @@ public class playerMovement : MonoBehaviour
         {
             transform.SetParent(other.transform);
         }
+        else if(other.gameObject.CompareTag("potion"))
+        {
+            Jars += 10;
+            jarCount.text = Jars.ToString();
+            Destroy(other.gameObject);
+        }
     }
     private void OnCollisionExit2D(Collision2D other)
     {
@@ -128,5 +145,14 @@ public class playerMovement : MonoBehaviour
         {
             transform.SetParent(null);
         }
+    }
+    private void setTimer()
+    {
+        timer = Time.time - startTime;
+        min =(int) timer / 60;
+        sec = (int)timer % 60;
+        
+        timeLabel.text=min+":" + sec;
+
     }
 }
