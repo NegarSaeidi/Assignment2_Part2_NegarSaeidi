@@ -222,7 +222,8 @@ public class playerMovement : MonoBehaviour
             Jars += 10;
             jarCount.text = Jars.ToString();
             other.gameObject.GetComponent<AudioSource>().Play();
-            Destroy(other.gameObject);
+            StartCoroutine(playSound(other.gameObject));
+           
         }
         else if (other.gameObject.CompareTag("hazard"))
         {
@@ -239,7 +240,12 @@ public class playerMovement : MonoBehaviour
             }
         }
     }
+    private IEnumerator playSound(GameObject other)
+    {
+        yield return new WaitForSeconds(0.3f);
 
+        Destroy(other.gameObject);
+    }
     private IEnumerator causeDelay(GameObject other)
     {
         yield return new WaitForSeconds(2.0f);
