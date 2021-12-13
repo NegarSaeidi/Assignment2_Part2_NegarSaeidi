@@ -1,3 +1,13 @@
+/*
+ *                    KNIGHT IN CASTLE
+ *                    Author: Negar Saeidi
+ *                    Student number : 101261396
+ *                    Date last modified: 12/12/2021
+ *                    Rivision history: 1st version :   EXPLODING PLATFORM BEHAVIOUR, EXPLODES THE PLATFORM 5 SEC AFTER PLAYER LANDS ON IT
+ *                 
+ *                    
+ *                    
+ */
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

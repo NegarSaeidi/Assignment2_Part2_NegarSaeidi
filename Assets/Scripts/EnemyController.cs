@@ -1,3 +1,13 @@
+/*
+ *                    KNIGHT IN CASTLE
+ *                    Author: Negar Saeidi
+ *                    Student number : 101261396
+ *                    Date last modified: 12/12/2021
+ *                    Rivision history: 1st version :   ENEMY BEHAVIOUR, ENEMY'S MOVEMENT, ENEMY'S ANIAMTION CONTROL, ENEMY'S LOS, PLAYER DETECTION, ATTACK
+ *                 
+ *                    
+ *                    
+ */
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
